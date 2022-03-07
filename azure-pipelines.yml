@@ -56,7 +56,7 @@ stages:
         displayName: 'AzureBlob File Copy'
         inputs:
           SourcePath: '$(System.DefaultWorkingDirectory)/$(repository)/drop'
-          azureSubscription: '$(azureSubscription)'
+          connectedServiceNameARM: '$(azureSubscription)'
           Destination: AzureBlob
           storage: '$(storage)'
           ContainerName: '$web'
