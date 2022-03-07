@@ -9,24 +9,56 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '14.x'
-  displayName: 'Install Node.js'
+variables:
+  azureSubscription: $(AZURE_SUBSCRIPTION)
+  repository: '_$(Build.Repository.Name)'
+  storage: $(CONTAINER_NAME)
 
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
+stages:
+  # Build Stage
+  - stage: BuildAndTest
+    jobs:
+      - job: BuildAndTest
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '14.x'
+          displayName: 'Install Node.js'
 
-- task: CopyFiles@2
-  displayName: 'copy files to: $(Build.ArtifactStagingDirectory)'
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/build'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        - script: |
+            npm install
+            npm run build
+          displayName: 'npm install and build'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: drop'
-  inputs:
-    PathtoPublish: '$(build.ArtifactStagingDirectory)'
+        - task: CopyFiles@2
+          displayName: 'copy files to: $(Build.ArtifactStagingDirectory)'
+          inputs:
+            SourceFolder: '$(System.DefaultWorkingDirectory)/build'
+            TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact: drop'
+          inputs:
+            PathtoPublish: '$(build.ArtifactStagingDirectory)'
+
+  # Release Stage
+  # Staging release
+  - stage: Release
+    jobs:
+    - job: Release
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+
+      - task: AzureFileCopy@2
+        displayName: 'AzureBlob File Copy'
+        inputs:
+          SourcePath: '$(System.DefaultWorkingDirectory)/$(repository)/drop'
+          azureSubscription: '$(azureSubscription)'
+          Destination: AzureBlob
+          storage: '$(storage)'
+          ContainerName: '$web'
+          BlobPrefix: '$(Build.SourceVersion)'
+          
