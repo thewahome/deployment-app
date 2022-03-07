@@ -43,22 +43,13 @@ stages:
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)'
 
-  # Release Stage
-  # Staging release
-  - stage: Release
-    jobs:
-    - job: Release
-      pool:
-        vmImage: 'ubuntu-latest'
-      steps:
-
-      - task: AzureFileCopy@2
-        displayName: 'AzureBlob File Copy'
-        inputs:
-          SourcePath: '$(System.DefaultWorkingDirectory)/$(repository)/drop'
-          connectedServiceNameARM: '$(azureSubscription)'
-          Destination: AzureBlob
-          storage: '$(storage)'
-          ContainerName: '$web'
-          BlobPrefix: '$(Build.SourceVersion)'
+        - task: AzureFileCopy@2
+          displayName: 'AzureBlob File Copy'
+          inputs:
+            SourcePath: '$(System.DefaultWorkingDirectory)/$(repository)/drop'
+            connectedServiceNameARM: '$(azureSubscription)'
+            Destination: AzureBlob
+            storage: '$(storage)'
+            ContainerName: '$web'
+            BlobPrefix: '$(Build.SourceVersion)'
           
