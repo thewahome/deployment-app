@@ -10,9 +10,9 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  azureSubscription: $(AZURE_SUBSCRIPTION)
+  azureSubscription: '$(AZURE_SUBSCRIPTION)'
   repository: '_$(Build.Repository.Name)'
-  storage: $(CONTAINER_NAME)
+  storage: '$(CONTAINER_NAME)'
 
 stages:
   # Build Stage
