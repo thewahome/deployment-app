@@ -6,11 +6,12 @@ variables:
   repository: '_$(Build.Repository.Name)'
   storage: '$(CONTAINER_NAME)'
 
+pool:
+  vmImage: ubuntu-latest
+
 stages:
   # Build Stage
   - stage: BuildAndTest
-    pool:
-      vmImage: ubuntu-latest
     jobs:
       - job: BuildAndTest
         steps:
@@ -30,15 +31,22 @@ stages:
             SourceFolder: '$(System.DefaultWorkingDirectory)/build'
             TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
-    # Build Stage
-  - stage: Preprocessing
-    pool:
-      vmImage: windows-latest
-    jobs:
-      - job: PerformPreprocessing
-        steps:
-
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Artifact: drop'
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)'
+
+    # Build Stage
+  - stage: Preprocessing
+    jobs:
+      - job: PerformPreprocessing
+        steps:
+
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'drop'
+            downloadPath: '$(System.ArtifactsDirectory)'
+
+     
