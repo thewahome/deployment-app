@@ -63,10 +63,18 @@ stages:
               Write-Host "Pipeline = $($htmlContent)"
 
               $content = Get-Content -Path $buildFile -Raw 
+              Write-Host "Pipeline = $($content)"
+              
               $html = New-Object -ComObject "HTMLFile"
-              $html.IHTMLDocument2_write($content)
+              try {
+                $html.IHTMLDocument2_write($content)
+              }
+              catch {
+                $src = [System.Text.Encoding]::Unicode.GetBytes($content)
+                $html.write($src)
+              }
               $scripts = $html.all.tags('script') | ForEach-Object src
-
+              Write-Host "Pipeline = $($scripts)"
 
               $scriptTags = ''
               foreach ($source in $scripts) {
