@@ -11,69 +11,70 @@ variables:
   sourceUrl: '$(SOURCE_URL)'
 
 stages:
-  - stage: PowershellScripting
+  - stage: BuildAndTest
+    pool:
+      vmImage: ubuntu-latest
     jobs:
-      - job: PowershellScripting
+      - job: BuildAndTest
         steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '14.x'
+          displayName: 'Install Node.js'
+
+        - script: |
+            npm install
+            npm run build
+          displayName: 'npm install and build'
+
+        - task: CopyFiles@2
+          displayName: 'copy files to: $(Build.ArtifactStagingDirectory)'
+          inputs:
+            SourceFolder: '$(System.DefaultWorkingDirectory)/build'
+            TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact: drop'
+          inputs:
+            PathtoPublish: '$(build.ArtifactStagingDirectory)'
+
+  - stage: Preprocessing
+    pool:
+      vmImage: windows-latest
+    jobs:
+      - job: PerformPreprocessing
+        steps:
+
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'drop'
+            downloadPath: '$(System.ArtifactsDirectory)'
 
         - task: PowerShell@2
           inputs:
             targetType: 'inline'
             script: |
               $url = "$($env:SOURCE_URL)"
+              $buildFile = '$(System.ArtifactsDirectory)/drop/index.html'
               Write-Host "URL: $url"
               $htmlContent = Invoke-WebRequest $url | Select-Object -ExpandProperty Content
               Write-Host "Pipeline = $($htmlContent)"
 
-# stages:
-#   - stage: BuildAndTest
-#     pool:
-#       vmImage: ubuntu-latest
-#     jobs:
-#       - job: BuildAndTest
-#         steps:
-#         - task: NodeTool@0
-#           inputs:
-#             versionSpec: '14.x'
-#           displayName: 'Install Node.js'
+              $content = Get-Content -Path $buildFile -Raw 
+              $html = New-Object -ComObject "HTMLFile"
+              $html.IHTMLDocument2_write($content)
+              $scripts = $html.all.tags('script') | ForEach-Object src
 
-#         - script: |
-#             npm install
-#             npm run build
-#           displayName: 'npm install and build'
 
-#         - task: CopyFiles@2
-#           displayName: 'copy files to: $(Build.ArtifactStagingDirectory)'
-#           inputs:
-#             SourceFolder: '$(System.DefaultWorkingDirectory)/build'
-#             TargetFolder: '$(Build.ArtifactStagingDirectory)'
+              $scriptTags = ''
+              foreach ($source in $scripts) {
+                $scriptTags += "<script src='$source'></script>"
+              }
+              $scriptTags += '</head>'
 
-#         - task: PublishBuildArtifacts@1
-#           displayName: 'Publish Artifact: drop'
-#           inputs:
-#             PathtoPublish: '$(build.ArtifactStagingDirectory)'
-
-#   - stage: Preprocessing
-#     pool:
-#       vmImage: windows-latest
-#     jobs:
-#       - job: PerformPreprocessing
-#         steps:
-
-#         - task: DownloadBuildArtifacts@0
-#           inputs:
-#             buildType: 'current'
-#             downloadType: 'single'
-#             artifactName: 'drop'
-#             downloadPath: '$(System.ArtifactsDirectory)'
-
-#         - task: PowerShell@2
-#           inputs:
-#             targetType: 'inline'
-#             script: |
-#               $url = "$($env:SOURCE_URL)"
-#               Write-Host "URL: $url"
-#               $htmlContent = Invoke-RestMethod -Uri $url | Select-Object -ExpandProperty Content
-#               Write-Host "Pipeline = $($htmlContent)"
-
+              $htmlContent -replace '</head>', $scriptTags | 
+                Set-Content $buildFile
+  
      
