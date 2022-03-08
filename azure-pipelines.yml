@@ -58,12 +58,11 @@ stages:
             script: |
               $url = "$($env:SOURCE_URL)"
               $buildFile = '$(System.ArtifactsDirectory)/drop/index.html'
-              Write-Host "URL: $url"
+              Write-Host "Calling: $url"
               $htmlContent = Invoke-WebRequest $url | Select-Object -ExpandProperty Content
-              Write-Host "Pipeline = $($htmlContent)"
+              Write-Host "Content received = $($htmlContent)"
 
               $content = Get-Content -Path $buildFile -Raw 
-              Write-Host "Pipeline = $($content)"
               
               $html = New-Object -ComObject "HTMLFile"
               try {
@@ -81,8 +80,18 @@ stages:
                 $scriptTags += "<script src='$source'></script>"
               }
               $scriptTags += '</head>'
+              Write-Host "Tags found: = $($scriptTags)"
 
               $htmlContent -replace '</head>', $scriptTags | 
                 Set-Content $buildFile
   
-     
+        - task: CopyFiles@2
+          displayName: 'copy files again: $(Build.ArtifactStagingDirectory)'
+          inputs:
+            SourceFolder: '$(System.ArtifactsDirectory)/drop'
+            TargetFolder: '$(Build.ArtifactStagingDirectory)/final'
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact: final'
+          inputs:
+            PathtoPublish: '$(build.ArtifactStagingDirectory)'
