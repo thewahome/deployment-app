@@ -1,15 +1,17 @@
-$srcFile = ".\index.html"  # source file that has the insert marker 
+#=== Source script line from build file === 
+$buildFile = '../public/index.html'
+$content = Get-Content -Path $buildFile -Raw 
+$html = New-Object -ComObject "HTMLFile"
+$html.IHTMLDocument2_write($content)
+$scripts = $html.all.tags('script') | ForEach-Object src
 
-#=== Fetch file from the set location === 
-Invoke-WebRequest https://gewayhome.z13.web.core.windows.net | 
-Select-Object -ExpandProperty Content | 
-Out-File $srcFile 
 
-#=== Add script lines to file === 
-$scriptTags = 
-'<script defer="defer" src="/static/js/main.3d6d2a62.js"></script>
-  <link href="/static/css/main.073c9b0a.css" rel="stylesheet">'
+#=== Generate script lines === 
+$scriptTags = ''
+foreach ($source in $scripts) {
+  $scriptTags += "<script src='$source'></script>"
+}
 $scriptTags += '</head>'
 
-(Get-Content $srcFile) -replace '</head>', $scriptTags | 
-	Set-Content $srcFile
+(Get-Content $buildFile) -replace '</head>', $scriptTags | 
+	Set-Content $buildFile
