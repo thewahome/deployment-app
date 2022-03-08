@@ -1,26 +1,18 @@
-# Node.js with React
-# Build a Node.js project that uses React.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
 trigger:
 - main
 
-pool:
-  vmImage: ubuntu-latest
-
 variables:
-  azureSubscription: '$(AZURE_SUBSCRIPTION)'
+  connectedServiceNameARM: '$(AZURE_SUBSCRIPTION)'
   repository: '_$(Build.Repository.Name)'
   storage: '$(CONTAINER_NAME)'
 
 stages:
   # Build Stage
   - stage: BuildAndTest
+    pool:
+      vmImage: ubuntu-latest
     jobs:
       - job: BuildAndTest
-        pool:
-          vmImage: 'ubuntu-latest'
         steps:
         - task: NodeTool@0
           inputs:
@@ -38,18 +30,15 @@ stages:
             SourceFolder: '$(System.DefaultWorkingDirectory)/build'
             TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
+    # Build Stage
+  - stage: Preprocessing
+    pool:
+      vmImage: windows-latest
+    jobs:
+      - job: PerformPreprocessing
+        steps:
+
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Artifact: drop'
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)'
-
-        - task: AzureFileCopy@2
-          displayName: 'AzureBlob File Copy'
-          inputs:
-            SourcePath: '$(System.DefaultWorkingDirectory)/$(repository)/drop'
-            connectedServiceNameARM: '$(azureSubscription)'
-            Destination: AzureBlob
-            storage: '$(storage)'
-            ContainerName: '$web'
-            BlobPrefix: '$(Build.SourceVersion)'
-          
