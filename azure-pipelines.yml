@@ -94,4 +94,4 @@ stages:
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Artifact: final'
           inputs:
-            PathtoPublish: '$(build.ArtifactStagingDirectory)'
+            PathtoPublish: '$(build.ArtifactStagingDirectory)/final'
