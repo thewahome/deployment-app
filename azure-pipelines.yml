@@ -47,6 +47,7 @@ stages:
         - checkout: none
 
         - task: DownloadBuildArtifacts@0
+          displayName: 'Download artifacts for preprocessing'
           inputs:
             buildType: 'current'
             downloadType: 'single'
@@ -87,13 +88,13 @@ stages:
                 Set-Content $buildFile
   
         - task: CopyFiles@2
-          displayName: 'copy files again: $(Build.ArtifactStagingDirectory)'
+          displayName: 'copy files again to republish: $(Build.ArtifactStagingDirectory)'
           inputs:
             SourceFolder: '$(System.ArtifactsDirectory)/drop'
             TargetFolder: '$(Build.ArtifactStagingDirectory)/final'
 
         - task: PublishBuildArtifacts@1
-          displayName: 'Publish Artifact: final'
+          displayName: 'Republish Artifact: final'
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)/final'
 
@@ -106,11 +107,12 @@ stages:
         - checkout: none
 
         - task: DownloadBuildArtifacts@0
+          displayName: 'Download artifacts'
           inputs:
             buildType: 'current'
             downloadType: 'single'
             artifactName: 'drop'
-            downloadPath: '$(System.DefaultWorkingDirectory)/$(repository)/drop'
+            downloadPath: '$(System.DefaultWorkingDirectory)/$(repository)'
 
 
         - task: AzureFileCopy@2
