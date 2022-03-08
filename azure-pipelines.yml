@@ -106,7 +106,7 @@ stages:
         - task: AzureFileCopy@2
           displayName: 'Copy files to blob storage'
           inputs:
-            SourcePath: '$(Build.ArtifactStagingDirectory)/drop'
+            SourcePath: '$(System.DefaultWorkingDirectory)/$(repository)/drop'
             azureSubscription: '$(connectedServiceNameARM)'
             Destination: AzureBlob
             storage: $(storage)
