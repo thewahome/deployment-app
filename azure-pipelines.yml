@@ -44,6 +44,7 @@ stages:
     jobs:
       - job: PerformPreprocessing
         steps:
+        - checkout: none
 
         - task: DownloadBuildArtifacts@0
           inputs:
@@ -102,6 +103,15 @@ stages:
     jobs:
       - job: Deploy
         steps:
+        - checkout: none
+
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'drop'
+            downloadPath: '$(System.DefaultWorkingDirectory)/$(repository)/drop'
+
 
         - task: AzureFileCopy@2
           displayName: 'Copy files to blob storage'
