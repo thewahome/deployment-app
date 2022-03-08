@@ -1,5 +1,8 @@
 trigger:
-- main
+  - main
+
+pool:
+  vmImage: windows-latest
 
 variables:
   connectedServiceNameARM: '$(AZURE_SUBSCRIPTION)'
@@ -7,18 +10,20 @@ variables:
   storage: '$(CONTAINER_NAME)'
   sourceUrl: '$(SOURCE_URL)'
 
-  jobs:
-    - job: PowershellScripting
-      steps:
+stages:
+  - stage: PowershellScripting
+    jobs:
+      - job: PowershellScripting
+        steps:
 
-      - task: PowerShell@2
-        inputs:
-          targetType: 'inline'
-          script: |
-            $url = "$($env:SOURCE_URL)"
-            Write-Host "URL: $url"
-            $htmlContent = Invoke-RestMethod -Uri $url | Select-Object -ExpandProperty Content
-            Write-Host "Pipeline = $($htmlContent)"
+        - task: PowerShell@2
+          inputs:
+            targetType: 'inline'
+            script: |
+              $url = "$($env:SOURCE_URL)"
+              Write-Host "URL: $url"
+              $htmlContent = Invoke-RestMethod -Uri $url | Select-Object -ExpandProperty Content
+              Write-Host "Pipeline = $($htmlContent)"
 
 # stages:
 #   - stage: BuildAndTest
