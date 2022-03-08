@@ -94,7 +94,7 @@ stages:
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Artifact: final'
           inputs:
-            PathtoPublish: '$(build.ArtifactStagingDirectory)/final'
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/final'
 
   - stage: Deployment
     pool:
@@ -106,7 +106,7 @@ stages:
         - task: AzureFileCopy@2
           displayName: 'Copy files to blob storage'
           inputs:
-            SourcePath: '$(Build.ArtifactStagingDirectory)/final'
+            SourcePath: '$(Build.ArtifactStagingDirectory)/drop'
             azureSubscription: '$(connectedServiceNameARM)'
             Destination: AzureBlob
             storage: $(storage)
