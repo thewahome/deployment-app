@@ -95,3 +95,20 @@ stages:
           displayName: 'Publish Artifact: final'
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)/final'
+
+  - stage: Deployment
+    pool:
+      vmImage: windows-latest
+    jobs:
+      - job: Deploy
+        steps:
+
+        - task: AzureFileCopy@2
+          displayName: 'Copy files to blob storage'
+          inputs:
+            SourcePath: '$(Build.ArtifactStagingDirectory)/final'
+            azureSubscription: '$(connectedServiceNameARM)'
+            Destination: AzureBlob
+            storage: $(storage)
+            ContainerName: '$web'
+            BlobPrefix: '$(Build.SourceVersion)'
