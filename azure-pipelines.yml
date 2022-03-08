@@ -22,7 +22,7 @@ stages:
             script: |
               $url = "$($env:SOURCE_URL)"
               Write-Host "URL: $url"
-              $htmlContent = Invoke-WebRequest -Uri $url | Select-Object -ExpandProperty Content
+              $htmlContent = Invoke-WebRequest $url | Select-Object -ExpandProperty Content
               Write-Host "Pipeline = $($htmlContent)"
 
 # stages:
