@@ -79,7 +79,7 @@ stages:
 
               $scriptTags = ''
               foreach ($source in $scripts) {
-                $scriptTags += "<script src='$(Build.SourceVersion)/$source'></script>"
+                $scriptTags += "<script src='/$(Build.SourceVersion)$source'></script>"
               }
               $scriptTags += '</head>'
               Write-Host "Tags found: = $($scriptTags)"
