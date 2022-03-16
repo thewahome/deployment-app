@@ -74,15 +74,23 @@ stages:
                 $src = [System.Text.Encoding]::Unicode.GetBytes($content)
                 $html.write($src)
               }
+
+              Write-Host "Fetching scripts and links for styling"
+
               $scripts = $html.all.tags('script') | ForEach-Object src
-              Write-Host "Pipeline = $($scripts)"
+              $cssLinks = $html.all.tags('link') |
+              Where-Object { $_.rel -eq 'stylesheet' } |
+              Select-Object -Expand href
 
               $scriptTags = ''
               foreach ($source in $scripts) {
-                $scriptTags += "<script src='/$(Build.SourceVersion)$source' defer></script>"
+                $scriptTags += "<script src='$source' defer></script>"
+              }
+
+              foreach ($link in $cssLinks) {
+                $scriptTags += "<link rel='stylesheet' href='$link'>"
               }
               $scriptTags += '</head>'
-              Write-Host "Tags found: = $($scriptTags)"
 
               $htmlContent -replace '</head>', $scriptTags | 
                 Set-Content $buildFile
