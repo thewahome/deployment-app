@@ -1,3 +1,5 @@
+name: deployment-trigger-runner
+
 trigger:
   - main
 
