@@ -43,5 +43,5 @@ stages:
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)'
 
-        - template: templates/hello-beta.yml@remoteRepo
-      
+  - stage: Preprocess
+  - template: templates/hello-beta.yml@remoteRepo
