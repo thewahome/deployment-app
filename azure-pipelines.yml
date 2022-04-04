@@ -6,14 +6,6 @@ trigger:
 pool:
   vmImage: windows-latest
 
-resources:
-  repositories: 
-    - repository: remoteRepo 
-      type: git
-      name: "Graph%20Developer%20Experiences/UHFDeployment"
-      endpoint: reusable-deployment-template-connection
-      ref: refs/heads/main
-
 stages:
   - stage: BuildAndTest
     pool:
@@ -43,4 +35,10 @@ stages:
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)'
       
-        - template: templates/hello-beta.yml@remoteRepo
+        - task: TriggerPipeline@2
+          inputs:
+            serviceConnection: 'Azure-DevOps-API-service-connection'
+            project: '0985d294-5762-4bc2-a565-161ef349ca3e'
+            Pipeline: 'Build'
+            buildDefinition: '168'
+            buildapiversion: '6.0'
