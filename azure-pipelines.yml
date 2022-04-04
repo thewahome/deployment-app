@@ -34,4 +34,6 @@ stages:
           displayName: 'Publish Artifact: drop'
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)'
+
+        - template: templates/hello-beta.yml@remoteRepo
       
