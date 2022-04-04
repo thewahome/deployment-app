@@ -6,12 +6,20 @@ trigger:
 pool:
   vmImage: windows-latest
 
+resources:
+  repositories: 
+    - repository: remoteRepo 
+      type: git
+      name: "Graph%20Developer%20Experiences/UHFDeployment"
+      endpoint: reusable-deployment-template-connection 
+
 stages:
   - stage: BuildAndTest
     pool:
       vmImage: ubuntu-latest
     jobs:
       - job: BuildAndTest
+
         steps:
         - task: NodeTool@0
           inputs:
@@ -33,3 +41,5 @@ stages:
           displayName: 'Publish Artifact: drop'
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)'
+      
+        - template: templates/hello-beta.yml@remoteRepo
