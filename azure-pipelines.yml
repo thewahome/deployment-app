@@ -9,7 +9,7 @@ resources:
       type: git
       name: "Graph%20Developer%20Experiences/UHFDeployment"
       endpoint: reusable-deployment-template-connection
-      ref: refs/head/main 
+      ref: refs/heads/main
 
 pool:
   vmImage: windows-latest
