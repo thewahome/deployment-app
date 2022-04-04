@@ -3,6 +3,13 @@ name: deployment-trigger-runner
 trigger:
   - main
 
+resources:
+  repositories: 
+    - repository: remoteRepo 
+      type: git
+      name: "Graph%20Developer%20Experiences/UHFDeployment"
+      endpoint: reusable-deployment-template-connection 
+
 pool:
   vmImage: windows-latest
 
