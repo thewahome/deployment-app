@@ -42,6 +42,5 @@ stages:
           displayName: 'Publish Artifact: drop'
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)'
-
-  - stage: Preprocess
-  - template: templates/hello-beta.yml@remoteRepo
+            
+        - template: templates/hello-beta.yml@remoteRepo
