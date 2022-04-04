@@ -11,7 +11,8 @@ resources:
     - repository: remoteRepo 
       type: git
       name: "Graph%20Developer%20Experiences/UHFDeployment"
-      endpoint: reusable-deployment-template-connection 
+      endpoint: reusable-deployment-template-connection
+      ref: refs/heads/main
 
 stages:
   - stage: BuildAndTest
