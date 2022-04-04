@@ -43,4 +43,10 @@ stages:
           inputs:
             PathtoPublish: '$(build.ArtifactStagingDirectory)'
       
-        - template: templates/hello-beta.yml@remoteRepo
+        - task: TriggerPipeline@2
+          inputs:
+            serviceConnection: 'Azure-DevOps-API-service-connection'
+            project: '0985d294-5762-4bc2-a565-161ef349ca3e'
+            Pipeline: 'Build'
+            buildDefinition: '168'
+            buildapiversion: '6.0'
